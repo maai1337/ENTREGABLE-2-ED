@@ -47,6 +47,14 @@ public:
     std::vector<std::string> preOrder();
     std::vector<std::string> postOrder();
     std::vector<std::string> inOrder();
+
+private:
+    std::string obtenerValorEtiqueta(Node* bookNode, const std::string& tag);
+    void listar_preorder(Node* node);
+
+public:
+    void listar();
+
 };
 
 #endif // TREE_HPP

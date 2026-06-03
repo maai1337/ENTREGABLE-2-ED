@@ -177,3 +177,31 @@ std::vector<std::string> Tree::inOrder() {
     inorder(rootNode);
     return result;
 }
+
+std::string Tree::obtenerValorEtiqueta(Node* bookNode, const std::string& tag) {
+    for (auto child : bookNode->children) {
+        if (child->data == tag && !child->children.empty()) {
+            return child->children[0]->data;
+        }
+    }
+    return "";
+}
+
+void Tree::listar_preorder(Node* node) {
+    if (!node) return;
+
+    if (node->data == "book") {
+        std::string id = obtenerValorEtiqueta(node, "id");
+        if (!id.empty()) {
+            std::cout << "ID: " << id << "\n";
+        }
+    }
+
+    for (auto child : node->children) {
+        listar_preorder(child);
+    }
+}
+
+void Tree::listar() {
+    listar_preorder(rootNode);
+}
