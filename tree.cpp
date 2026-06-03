@@ -205,3 +205,56 @@ void Tree::listar_preorder(Node* node) {
 void Tree::listar() {
     listar_preorder(rootNode);
 }
+
+void Tree::precursores_recursivo(Node* node) {
+    if (!node) return;
+
+    if (node->data == "book") {
+        std::string idStr = obtenerValorEtiqueta(node, "id");
+        std::string yearStr = obtenerValorEtiqueta(node, "publication_year");
+
+        if (!idStr.empty() && !yearStr.empty()) {
+            try {
+                int mainYear = std::stoi(yearStr);
+                bool cumpleCondicion = true;
+                bool tieneSimilares = false;
+
+                Node* similarNode = nullptr;
+                for (auto c : node->children) {
+                    if (c->data == "similar_books") {
+                        similarNode = c;
+                        break;
+                    }
+                }
+
+                if (similarNode) {
+                    for (auto simBook : similarNode->children) {
+                        if (simBook->data == "book") {
+                            tieneSimilares = true;
+                            std::string simYearStr = obtenerValorEtiqueta(simBook, "publication_year");
+                            if (!simYearStr.empty()) {
+                                int simYear = std::stoi(simYearStr);
+                                if (simYear <= mainYear) {
+                                    cumpleCondicion = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (tieneSimilares && cumpleCondicion) {
+                    std::cout << "ID Precursor: " << idStr << "\n";
+                }
+            } catch (...) {}
+        }
+    }
+
+    for (auto child : node->children) {
+        precursores_recursivo(child);
+    }
+}
+
+void Tree::precursores() {
+    precursores_recursivo(rootNode);
+}

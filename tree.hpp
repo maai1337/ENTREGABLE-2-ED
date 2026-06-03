@@ -55,6 +55,11 @@ private:
 public:
     void listar();
 
+private:
+    void precursores_recursivo(Node* node);
+
+public:
+    void precursores();
 };
 
 #endif // TREE_HPP
