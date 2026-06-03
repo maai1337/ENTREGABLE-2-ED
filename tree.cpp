@@ -104,6 +104,7 @@ void Tree::deleteSubtree(Node* node) {
     for (auto child : node->children)
         deleteSubtree(child);
     delete node;
+	treeSize--;
 }
 
 bool Tree::remove(const std::string& value) {
@@ -257,4 +258,37 @@ void Tree::precursores_recursivo(Node* node) {
 
 void Tree::precursores() {
     precursores_recursivo(rootNode);
+}
+
+void Tree::borrar_ratings(float r) {
+    if (!rootNode) return;
+
+    Node* booksNode = nullptr;
+    for (auto child : rootNode->children) {
+        if (child->data == "books") {
+            booksNode = child;
+            break;
+        }
+    }
+
+    if (!booksNode) return;
+
+    for (int i = (int)booksNode->children.size() - 1; i >= 0; i--) {
+        Node* bookNode = booksNode->children[i];
+
+        if (bookNode->data == "book") {
+            std::string ratingStr = obtenerValorEtiqueta(bookNode, "average_rating");
+
+            if (!ratingStr.empty()) {
+                try {
+                    float rating = std::stof(ratingStr);
+                    if (rating <= r) {
+                        deleteSubtree(bookNode);
+
+                        booksNode->children.erase(booksNode->children.begin() + i);
+                    }
+                } catch (...) {}
+            }
+        }
+    }
 }

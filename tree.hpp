@@ -60,6 +60,9 @@ private:
 
 public:
     void precursores();
+
+public:
+    void borrar_ratings(float r);
 };
 
 #endif // TREE_HPP
