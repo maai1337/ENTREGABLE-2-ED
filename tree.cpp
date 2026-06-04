@@ -179,6 +179,8 @@ std::vector<std::string> Tree::inOrder() {
     return result;
 }
 
+// Funcion que ayuda a buscar un tag/etiqueta (como "id" o "publication_year")
+// dentro de un nodo de libro y devolver el texto que contiene.
 std::string Tree::obtenerValorEtiqueta(Node* bookNode, const std::string& tag) {
     for (auto child : bookNode->children) {
         if (child->data == tag && !child->children.empty()) {
@@ -188,6 +190,7 @@ std::string Tree::obtenerValorEtiqueta(Node* bookNode, const std::string& tag) {
     return "";
 }
 
+// Esta funcion usa recursion y es para recorrer el arbol en pre-order
 void Tree::listar_preorder(Node* node) {
     if (!node) return;
 
@@ -207,6 +210,7 @@ void Tree::listar() {
     listar_preorder(rootNode);
 }
 
+// Revisa cada nodo recursivamente para ver si cumple la condicion de ser precursor
 void Tree::precursores_recursivo(Node* node) {
     if (!node) return;
 
@@ -214,12 +218,14 @@ void Tree::precursores_recursivo(Node* node) {
         std::string idStr = obtenerValorEtiqueta(node, "id");
         std::string yearStr = obtenerValorEtiqueta(node, "publication_year");
 
+		// Este if revisa que el libro tenga id y año de publicacion validos
         if (!idStr.empty() && !yearStr.empty()) {
             try {
                 int mainYear = std::stoi(yearStr);
                 bool cumpleCondicion = true;
                 bool tieneSimilares = false;
 
+				// Se busca el nodo que contenga libros similares
                 Node* similarNode = nullptr;
                 for (auto c : node->children) {
                     if (c->data == "similar_books") {
@@ -229,12 +235,14 @@ void Tree::precursores_recursivo(Node* node) {
                 }
 
                 if (similarNode) {
+					// Aqui se revisa cada libro similar dentro de la lista
                     for (auto simBook : similarNode->children) {
                         if (simBook->data == "book") {
                             tieneSimilares = true;
                             std::string simYearStr = obtenerValorEtiqueta(simBook, "publication_year");
                             if (!simYearStr.empty()) {
                                 int simYear = std::stoi(simYearStr);
+								// Este if hace que la condicion falle si un libro similar salio el mismo año o antes
                                 if (simYear <= mainYear) {
                                     cumpleCondicion = false;
                                     break;
@@ -243,14 +251,14 @@ void Tree::precursores_recursivo(Node* node) {
                         }
                     }
                 }
-
+				// Si tiene libros similares y todos los similares salieron despues, entonces es precursor
                 if (tieneSimilares && cumpleCondicion) {
                     std::cout << "ID Precursor: " << idStr << "\n";
                 }
             } catch (...) {}
         }
     }
-
+	// Continua recorriendo el arbol
     for (auto child : node->children) {
         precursores_recursivo(child);
     }
@@ -260,9 +268,11 @@ void Tree::precursores() {
     precursores_recursivo(rootNode);
 }
 
+// Funcion que elimina del arbol todos los libros con un rating menor o igual a r
 void Tree::borrar_ratings(float r) {
     if (!rootNode) return;
 
+	// Busca el nodo principal books que tiene a todos los libros
     Node* booksNode = nullptr;
     for (auto child : rootNode->children) {
         if (child->data == "books") {
@@ -273,6 +283,7 @@ void Tree::borrar_ratings(float r) {
 
     if (!booksNode) return;
 
+	// Recorre la lista de libros de atras a adelante, asi evita saltarse elementos al borrar nodos del vector
     for (int i = (int)booksNode->children.size() - 1; i >= 0; i--) {
         Node* bookNode = booksNode->children[i];
 
@@ -282,6 +293,7 @@ void Tree::borrar_ratings(float r) {
             if (!ratingStr.empty()) {
                 try {
                     float rating = std::stof(ratingStr);
+					// Si el rating es menor o igual a r, se elimina
                     if (rating <= r) {
                         deleteSubtree(bookNode);
 
